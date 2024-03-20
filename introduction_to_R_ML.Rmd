@@ -32,7 +32,7 @@ graphical display of data and the use of R for statistical modelling and Machine
 As with any programming language, investments made on mastering the basics are likely to pay off in the
 advanced sessions.
 
-### lets start coding 
+### Now let's start coding 
 ```{r}
 2+5
 ```
