@@ -1,0 +1,49 @@
+---
+title: "DATA ANALYSIS AND VISUALIZATION IN R"
+author: "Clifford Oduor,MSc"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    theme: journal
+    highlight: tango
+    toc: true
+---
+
+# **Introduction to R**
+
+R is a system for data manipulation, statistical computation and graphics liked for its flexibility in
+data manipulation, high-level graphics, and numerous specialized add-on packages that will
+handle almost all - if not all - of your statistical needs.
+The latest version of R can be downloaded from the Comprehensive R Archive Network- CRAN - main website is http://cran.r-project.org.
+
+### *Important Note:*
+1. R is case-sensitive
+2. The # character at the beginning of a line signifies a comment, and is therefore not
+executed. This is very helpful in describing codes and their functions
+3. Help files for R functions are obtained by preceding the function name with ? (e.g. ?mean)
+
+These training sessions have been organized into 4 main sessions.Each session
+includes a short talk and a practical session during which participants are allowed sufficient
+time for the more exciting interaction with R (perhaps the fastest route to being comfortable
+working with R). The initial sessions will be spent familiarizing ourselves with the R environment,
+installing/loading packages, creating and using R functions. Thereafter we will use R for data
+wrangling, descriptives and elementary statistics, before delving into the more engaging
+graphical display of data and the use of R for statistical modelling and Machine learning.
+As with any programming language, investments made on mastering the basics are likely to pay off in the
+advanced sessions.
+
+### lets start coding 
+```{r}
+2+5
+```
+
+```{r}
+#Operators < − or = are used to assign things or store objects
+obj1<-2+5
+obj1
+```
+
+```{r}
+sessionInfo()
+```
+
