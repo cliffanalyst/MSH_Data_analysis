@@ -21,6 +21,11 @@ The latest version of R can be downloaded from the Comprehensive R Archive Netwo
 2. The # character at the beginning of a line signifies a comment, and is therefore not
 executed. This is very helpful in describing codes and their functions
 3. Help files for R functions are obtained by preceding the function name with ? (e.g. ?mean)
+4. R resources and finding help
+* stack overflow
+* Rbloggers
+* Rseek
+
 
 These training sessions have been organized into 4 main sessions.Each session
 includes a short talk and a practical session during which participants are allowed sufficient
