@@ -1,5 +1,5 @@
 ---
-title: "DATA ANALYSIS AND VISUALIZATION IN R"
+title: "DATA SCIENCE IN R"
 author: "Clifford Oduor,MSc"
 date: "`r Sys.Date()`"
 output: 
@@ -37,16 +37,759 @@ graphical display of data and the use of R for statistical modelling and Machine
 As with any programming language, investments made on mastering the basics are likely to pay off in the
 advanced sessions.
 
-### Now let's start coding 
+Now let's start coding 
+
+### Data types
+A dataset may contain variables with different data types.
+
 ```{r}
+rm(list=ls())
+gc()
+```
+
+```{r}
+#Numeric
 2+5
 ```
 
 ```{r}
+#Character
 #Operators < − or = are used to assign things or store objects
-obj1<-2+5
-obj1
+dat1 <- c("two","three","six","fifteen")
+dat1
+
 ```
+
+```{r}
+#Operators < − or = are used to assign things or store objects
+num1<-2+5
+num1
+```
+
+```{r}
+#Logical 
+obj1<- TRUE
+obj2<- FALSE
+obj3<- obj1 & !obj2
+obj3
+
+```
+
+```{r}
+#Data structures
+#vectors:these are one-dimensional array that can hold data of the same type 
+dat2 <- c(2,3,6,15)
+dat2
+```
+
+
+```{r}
+#data frame:two-dimensional collection of elements of different data types 
+dat3 <- data.frame(dat1,dat2)
+dat3
+```
+
+```{r}
+#checking if an object is  of type integer
+is.integer(obj1) 
+```
+
+```{r}
+#Check data type
+typeof(obj1)
+
+```
+### Functions in R
+R functions are a special type of object with
+power to change or manipulate other objects.
+
+```{r}
+mean(dat3)
+
+```
+### Creating your own R function
++ They structure code, making it easier to read and maintain the code
++ They help in reusing of code, hence reducing duplication of code- Duplication of code is a bad programming style.
+```{r}
+divid <- function(x,y){
+  result <- x/y;
+  return(result)}
+
+divid(12,8)
+```
+### *Exercise 1*
+1. Create an object named m with the value 15.
+2. Create an object named n with the value 17.
+3. Add m to n.
+4. Divide m by n.
+5. Create a function called mulp() which multiplies two numbers.
+6. Send 40 and 80 to mulp().
+
+
+# **Importing data and Data wrangling in R**
+
+Data read into R can be in two main formats. 
+1. default R format *.rdata, and 
+2. Text files mainly tab-delimited text files *.TXT, comma separated versions *.CSV 
+
+Data may be imported into R using two ways:
+1. Accessing datasets “built in” R which come as part of a libraries loaded into the console
+2. Importing data from external sources (eg Excel spreadsheets, Access databases,MySQL, text files, spss files, sas files…etc)
+
+### *R Packages:*
+R Packages are collections of R functions, data, and compiled code in a well-defined format.
+* The directory where packages are stored is called the library. 
+* R comes with a standard set of packages. 
+* Others are available for download and installation. 
+* Once installed, they have to be loaded into the session to be used.
+
+### *Import*
+
+We are going to import data on Maternal mortality ratios(MMR) and The Human Development Index (HDI) for all countries in the world.
+HDI measures each country's social and economic development. 
+
+### Installing and using R packages
+```{r}
+# To Add a Package use: 
+#install.packages("dplyr")
+#install.packages("haven")
+#install.packages("Rtools")
+#install.packages("table1")
+
+require(foreign)
+require(haven)
+require(dplyr)
+require(readxl)
+require(readr)
+require(rio)
+require(ggplot2)
+require(magrittr)
+library(naniar)
+
+```
+
+```{r}
+#To see all packages installed use: 
+library()
+```
+
+```{r}
+#To see packages currently loaded 
+search()
+```
+
+```{r}
+data1<-read.csv("C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/dataset1.csv",header = TRUE,sep=",",na="")
+data2<-read.csv("C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/dataset2.csv",header = TRUE,sep=",",na="")
+```
+
+### Viewing data
+```{r}
+head(data1,5)
+```
+
+```{r}
+tail(data1,5)
+```
+
+
+```{r}
+dim(data1)
+```
+
+```{r}
+View(data1)
+```
+
+```{r}
+#view data type
+str(data1)
+```
+
+```{r}
+names(data1)
+
+```
+
+Once you have imported your data set in r, in order to use it for analysis you can either attach it to r using attach() command or use $ sign to point to a variable a data frame.
+
+```{r}
+summary(data1$HDI_Rank)
+```
+
+```{r}
+names(data1)
+```
+
+```{r}
+names(data2)
+```
+
+###Checking for inconsistencies
+```{r}
+miss_var_summary(data1,order=TRUE)
+```
+
+```{r}
+miss_var_summary(data2,order=TRUE)
+```
+
+###Handling missing values 
+```{r}
+View(data1[is.na(data1$HDI_Rank),])
+
+```
+
+```{r}
+View(data2[is.na(data2$MMR),])
+
+```
+
+
+```{r}
+# After reviewing the data we decide to replace the missing values for id 4:
+data2$MMR[data2$ID==4]=45
+
+```
+
+
+```{r}
+#replacing missing values with mean
+data2$MMR[is.na(data2$MMR)] <- round(mean(data2$MMR, na.rm = TRUE))
+data1$HDI_Rank[is.na(data1$HDI_Rank)] <- round(mean(data1$HDI_Rank, na.rm = TRUE))
+
+```
+
+
+```{r}
+#Identify correct value from the questionnaires
+table(data1$Continent)
+```
+
+```{r}
+#Make appropriate changes using the command:
+data1$Continent[data1$Continent=="AAfrica"]<-"Africa"
+
+```
+
+```{r}
+#checking for duplicates
+dup<-duplicated(data1$ID)
+table(dup)
+```
+
+
+```{r}
+#Transform continuous variable to categorical variables
+data1$hdicat<-NA
+data1$hdicat[data1$HDI_Rank<=49]=1
+data1$hdicat[data1$HDI_Rank>49]=2
+#labeling
+data1$hdicat=factor(data1$hdicat,levels=c(1,2),labels=c("<Below 50","50 and Above"))
+table(data1$hdicat)
+```
+
+```{r}
+#convert character to numeric
+table(data1$Hemisphere)
+```
+
+```{r}
+data1$Hemispherecat<-ifelse(data1$Hemisphere=="Northern Hemisphere",1,2)
+table(data1$Hemispherecat)
+```
+
+
+```{r}
+data1$Hemispherecat=factor(data1$Hemispherecat,levels=c(1,2),labels=c("North","south"))
+table(data1$Hemispherecat)
+```
+
+###Adding variables
+
+```{r}
+#rnorm(891, mean = 37, sd = 2) 
+
+#temp<-rnorm(186,37,2)
+```
+
+```{r}
+#datab<-cbind(data1,temp)
+#head(datab)
+
+```
+###Appending and merging data frames 
+When appending two datasets, the names of the variables must be the same
+```{r}
+#install.packages("gtools")
+require(gtools)
+```
+
+```{r}
+data3<-read.csv("C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/dataset3.csv",header = TRUE,sep=",",na="")
+```
+
+
+```{r}
+#Transform continuous variable to categorical variables
+data3$hdicat<-NA
+data3$hdicat[data3$HDI_Rank<=49]=1
+data3$hdicat[data3$HDI_Rank>49]=2
+#labeling
+data3$hdicat=factor(data3$hdicat,levels=c(1,2),labels=c("<Below 50","50 and Above"))
+table(data3$hdicat)
+
+```
+
+```{r}
+data3$Hemispherecat<-ifelse(data3$Hemisphere=="Northern Hemisphere",1,2)
+table(data3$Hemispherecat)
+```
+
+```{r}
+data3$Hemispherecat=factor(data3$Hemispherecat,levels=c(1,2),labels=c("North","south"))
+table(data3$Hemispherecat)
+```
+
+```{r}
+#appending two datasets
+data_append<-smartbind(data1,data3)
+```
+
+```{r}
+#merging two datasets 
+merged_data<-merge(data_append,data2,by=c("ID"))
+View(merged_data)
+#merged_data<- merge(data1,data2,by.x="PassengerId",by.y="PassengerId", all.x=T)
+```
+###subsetting data frames 
+```{r}
+data_Asia<-merged_data %>%
+filter(Continent=="Asia")
+```
+
+```{r}
+#Subsetting data
+data_Asia_100<- subset(merged_data, Continent =="Asia" & MMR<100)
+```
+
+
+###stack and unstack data frames (long/wide format)
+```{r}
+#stack_df<-stack(data_males)
+
+```
+
+```{r}
+#unstack_df<-unstack(stack_df)
+
+```
+
+
+```{r}
+#Saving data
+save(merged_data, file = "C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/merged_data.Rdata")
+
+```
+
+#**Exploratory data analysis (EDA)**
+
+```{r}
+rm(list=ls())
+load(file = "C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/merged_data.Rdata")
+
+```
+
+```{r}
+head(merged_data,2)
+```
+
+```{r}
+dim(merged_data)
+```
+
+
+```{r}
+names(merged_data)
+
+```
+
+```{r}
+#frequency tables
+table(merged_data$Hemispherecat)
+```
+
+```{r}
+#Table of proportions
+prop.table(table(merged_data$Hemispherecat))*100
+
+```
+
+```{r}
+#install.packages("Rtools")
+#install.packages("table1")
+#require (table1)
+
+```
+
+```{r}
+#table1(~factor(data1$sexcat))
+
+```
+
+```{r}
+#Cross tabulations of categorical variables
+
+table(merged_data$Hemispherecat,merged_data$Continent)
+```
+
+
+```{r}
+#install.packages("shiny")
+#require(shiny)
+```
+
+```{r}
+#set up factors
+# merged_data$Survived<-as.factor(merged_data$Survived)
+# merged_data$Sex<-as.factor(merged_data$Sex)
+# merged_data$agecat1<-as.factor(merged_data$agecat1)
+# merged_data$Embarked<-as.factor(merged_data$Embarked)
+```
+
+```{r}
+#able1(~(Sex)+(agecat1)+(Embarked)|Survived, data = merged_data)
+
+```
+
+```{r}
+#Descriptive statistics for continuous variables
+summary(merged_data$MMR)
+```
+###Data Visualization 
+
+```{r}
+library(ggplot2)
+```
+ 
+```{r}
+str(merged_data)
+```
+ 
+ 
+```{r}
+merged_data$MMR<-as.numeric(merged_data$MMR)
+```
+ 
+
+```{r}
+#bar graph
+ggplot(data=merged_data, aes(x=Hemispherecat,y=MMR,fill=Hemispherecat))+ 
+         geom_bar(stat="identity")+ylim(0,1000)+
+         ggtitle("Bar graph of MMR by Hemisphere")
+
+```
+
+```{r}
+# #Add new variable say dob
+# dob<-sample(seq(as.Date('1944/01/01'), as.Date('2024/01/01'), by="day"), 891)
+# data4<-cbind(data3,dob)
+
+```
+
+```{r}
+#Box plot
+box1<- ggplot(data=merged_data,aes(x=Hemispherecat, y=MMR,fill=Continent)) + geom_boxplot() + ggtitle("Distribution of MMR across continent")+ ylab("MMR")
+box1
+
+```
+
+```{r}
+#Histogram
+hist1<-ggplot(data=merged_data,aes(x=MMR))+  geom_histogram()+ggtitle("A histogram of MMR")+xlab("MMR")+ylab("Frequency")
+hist1
+
+```
+
+```{r}
+#scatter plot
+plot<-ggplot(merged_data, aes(HDI_Rank, MMR)) + geom_point() + xlim(0, 200)+ ylim(0,1000)
+plot
+
+```
+
+
+```{r}
+#How to convert ggplot2 graph into a plotly
+#install.packages("plotly")
+library(plotly)
+ggplotly(plot)
+
+```
+
+
+```{r}
+ggplot(data=merged_data,aes(x=HDI_Rank,y=MMR)) + geom_point()+geom_smooth(method = "lm")+
+  scale_x_continuous("HDI")+ scale_y_continuous("MMR")
+```
+
+```{r}
+#Line plot with multiple groups
+
+# lp<-ggplot(data=merged_data, aes(x=Age, y=Fare, group=Embarked)) +
+#   geom_line()
+# lp
+
+```
+
+```{r}
+names(merged_data)
+```
+
+# **Elementary statistics**
+
+```{r}
+## Visualise the distribution of age
+##Checking for normality
+hist(merged_data$MMR, xlab="MMR", col="green",main="")
+```
+
+```{r}
+hist(merged_data$HDI_Rank, xlab="HDI_Rank", col="green",main="")
+```
+
+```{r}
+#Shapiro-Wilk test can be performed as follow:
+#Null hypothesis: the data are normally distributed
+shapiro.test(merged_data$MMR) 
+shapiro.test(merged_data$HDI_Rank) 
+```
+
+```{r}
+#shapiro.test(merged_data$Fare)
+```
+
+
+```{r}
+## Testing for normality
+# qqnorm(data1$Age)
+# qqline(data1$Age,lty=2)
+
+```
+
+```{r}
+names(merged_data)
+```
+
+```{r}
+plot(merged_data$HDI_Rank,merged_data$MMR) 
+```
+
+### Spearman rank correlation coefficient
+```{r}
+#measures a linear dependence between two variables (x and y)
+cor(merged_data$HDI_Rank, merged_data$MMR,  method = "spearman", use = "complete.obs")
+
+```
+
+### Two-sample t-test for means (comparing two independent means)
+```{r}
+#Null hypothesis: there is no difference in MMR by North and south hemisphere
+t.test(merged_data$MMR~as.factor(merged_data$Hemispherecat), data=merged_data)
+
+```
+
+```{r}
+#One-way ANOVA
+#Used to determine variation between different groups of the independent variable
+anova(lm(merged_data$MMR~as.factor(merged_data$Continent)))
+```
+
+### Chi-square test
+```{r}
+#cross tabulation
+#Suppose in our data we wanted to establish if test differed by sex
+table(merged_data$sexcat,merged_data$Test.Results)
+```
+
+```{r}
+## conduct a chisq test
+chisq.test(merged_data$hdicat,merged_data$Hemispherecat)
+```
+
+# **Statistical modelling in R**
+### Purpose of modelling is understanding relationships between variables and allows us to make predictions on previously unseen data
+```{r}
+library(ISLR2)
+library(MASS)
+library(caret)
+library(splines)
+library(pROC)
+```
+
+```{r}
+rm(list=ls())
+load(file = "C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/merged_data.Rdata")
+```
+
+### Linear regression
+
+```{r}
+plot(merged_data$MMR, merged_data$HDI_Rank)
+```
+
+```{r}
+#What is the association between age of patients and billing amount?
+model1<-lm(MMR~HDI_Rank,data=merged_data)
+summary(model1)
+
+```
+### Evaluating model accuracy
+### Root mean square error: measures the average difference between values predicted by a model and the actual values.
+### It provides an estimation of how well the model is able to predict the target value (accuracy). 
+### The lower the value of the Root Mean Squared Error, the better the model is.
+
+```{r}
+mse =mean((merged_data$MMR-predict(model1))^2)
+rmse<- sqrt(mean((predict(model1)-merged_data$MMR)^2))
+mse 
+rmse
+```
+
+
+```{r}
+###Saving the Model#####
+saveRDS(model1, file="C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/model1.RDS")
+#model<-readRDS("C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/model1.RDS")
+
+```
+
+### Multivariable linear regression
+```{r}
+#What is the association between age,gender of patients and billing amount?
+model2<-lm(MMR~HDI_Rank+Hemispherecat,data=merged_data)
+summary(model2)
+
+```
+
+```{r}
+str(merged_data$hdicat)
+```
+
+### Logistic(Binary) regression
+```{r}
+model3<-glm(hdicat~MMR,data=merged_data,family="binomial")
+summary(model3)
+summary(model3)$coef
+
+```
+
+```{r}
+exp(coef(model3))
+```
+
+```{r}
+exp(cbind(Odds_Ratio = coef(model3), confint(model3)))
+```
+
+# **MACHINE LEARNING in R**
+
+#From Previous lessons we have:
+Explored the data
+Data cleaning
+Prepared
+
+Pick learning:predict a countrie HDI category based on different predictors/features/variables/columns
+```{r}
+library(naniar)     # used for checking for missing values
+library(dplyr)      # used for data manipulation and joining
+library(ggplot2)    # used for plotting 
+library(caret)      # used for modeling
+library(cowplot)    # used for combining multiple plots 
+
+```
+
+
+```{r}
+rm(list=ls())
+load(file = "C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/merged_data.Rdata")
+```
+### *Explore data*
+```{r}
+#EXPLORE DATA
+miss_var_summary(merged_data,order=TRUE)
+```
+
+```{r}
+gg_miss_var(merged_data)
+```
+
+```{r}
+names(merged_data)
+```
+
+### *Feature Engineering*
+#Feature engineering entails reformatting predictor values to make them easier for a model to use effectively
+Involves:Converting variables into factors,Selecting specific columns,filter rows based on certain criteria,group data by one or more variables and perform aggregate calculations,
+reshape and restructure data,normalization, scaling, encoding, and feature selection.
+It is a crucial step in building a good machine-learning model.Helps increase the accuracy of the model thereby enhancing the results of the predictions.
+
+```{r}
+#Selecting specific columns
+subset_data<-subset(merged_data,select =-c(ID,HDI_Rank,Hemisphere))
+```
+
+```{r}
+str(subset_data)
+```
+
+```{r}
+#one hot encoding of specific variables
+oneHot_vars<-subset(subset_data,select=c(Continent))
+dummy <- dummyVars(" ~ .", data=oneHot_vars)
+newdata <- data.frame(predict(dummy, newdata = oneHot_vars))
+```
+
+```{r}
+hot<-subset(subset_data,select=-c(Continent))
+```
+
+```{r}
+subset_data1<-cbind(hot,newdata)
+miss_var_summary(subset_data1,order=TRUE)
+```
+
+```{r}
+#SPLITTING THE DATA FOR TRAINING AND LOCAL TESTING
+indexes<-createDataPartition(subset_data1$hdicat,times=1,p=0.8,list =FALSE)
+
+train<-subset_data1[indexes,]
+test<-subset_data1[-indexes,]
+```
+
+### *Algorithm selection*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 sessionInfo()
