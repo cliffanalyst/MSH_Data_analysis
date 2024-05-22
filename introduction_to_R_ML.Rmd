@@ -1,5 +1,5 @@
 ---
-title: "DATA SCIENCE IN R"
+title: "AN INTRODUCTION TO DATA SCIENCE IN R MODULE"
 author: "Clifford Oduor,MSc"
 date: "`r Sys.Date()`"
 output: 
@@ -699,7 +699,7 @@ Explored the data
 Data cleaning
 Prepared
 
-Pick learning:predict a countrie HDI category based on different predictors/features/variables/columns
+Pick learning:predict a countries HDI category based on different predictors/features/variables/columns
 ```{r}
 library(naniar)     # used for checking for missing values
 library(dplyr)      # used for data manipulation and joining
@@ -712,8 +712,14 @@ library(cowplot)    # used for combining multiple plots
 
 ```{r}
 rm(list=ls())
+gc()
 load(file = "C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/merged_data.Rdata")
 ```
+
+```{r}
+write.csv(merged_data, "C:/MSH/DATA_SCIENCE/MY_TRAINING/datasets/MMR/merged_data.csv", row.names=FALSE)
+```
+
 ### *Explore data*
 ```{r}
 #EXPLORE DATA
@@ -735,36 +741,36 @@ reshape and restructure data,normalization, scaling, encoding, and feature selec
 It is a crucial step in building a good machine-learning model.Helps increase the accuracy of the model thereby enhancing the results of the predictions.
 
 ```{r}
-#Selecting specific columns
-subset_data<-subset(merged_data,select =-c(ID,HDI_Rank,Hemisphere))
+#Selecting specific features
+features<-subset(merged_data,select =-c(ID,HDI_Rank,Hemisphere))
 ```
 
 ```{r}
-str(subset_data)
+str(features)
 ```
 
 ```{r}
 #one hot encoding of specific variables
-oneHot_vars<-subset(subset_data,select=c(Continent))
+oneHot_vars<-subset(features,select=c(Continent))
 dummy <- dummyVars(" ~ .", data=oneHot_vars)
 newdata <- data.frame(predict(dummy, newdata = oneHot_vars))
 ```
 
 ```{r}
-hot<-subset(subset_data,select=-c(Continent))
+encoded_data<-subset(features,select=-c(Continent))
 ```
 
 ```{r}
-subset_data1<-cbind(hot,newdata)
-miss_var_summary(subset_data1,order=TRUE)
+encoded_data<-cbind(encoded_data,newdata)
+miss_var_summary(encoded_data,order=TRUE)
 ```
 
 ```{r}
 #SPLITTING THE DATA FOR TRAINING AND LOCAL TESTING
-indexes<-createDataPartition(subset_data1$hdicat,times=1,p=0.8,list =FALSE)
+indexes<-createDataPartition(encoded_data$hdicat,times=1,p=0.8,list =FALSE)
 
-train<-subset_data1[indexes,]
-test<-subset_data1[-indexes,]
+train<-encoded_data[indexes,]
+test<-encoded_data[-indexes,]
 ```
 
 ### *Algorithm selection*
