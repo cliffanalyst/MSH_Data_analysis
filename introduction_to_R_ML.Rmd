@@ -747,6 +747,18 @@ features<-subset(merged_data,select =-c(ID,HDI_Rank,Hemisphere))
 
 ```{r}
 str(features)
+
+```
+
+
+```{r}
+names(features)
+```
+
+```{r}
+#label encoding
+features$Country <-  as.integer(factor(features$Country))
+features$Continent <-  as.integer(factor(features$Continent))
 ```
 
 ```{r}
@@ -769,30 +781,67 @@ miss_var_summary(encoded_data,order=TRUE)
 #SPLITTING THE DATA FOR TRAINING AND LOCAL TESTING
 indexes<-createDataPartition(encoded_data$hdicat,times=1,p=0.8,list =FALSE)
 
-train<-encoded_data[indexes,]
-test<-encoded_data[-indexes,]
+train_data<-encoded_data[indexes,]
+test_data<-encoded_data[-indexes,]
 ```
 
 ### *Algorithm selection*
+#Depends on whether the problem is a regression (predicting continuous values) or a classification (predicting categorical values) problem
+```{r}
+#Decision trees
+#install.packages("party")
+#install.packages
+#install.packages("rpart.plot")
+#install.packages("vip")
+library(party)
+library(tidymodels)
+library(vip)
+
+```
+
+```{r}
+tree_fit <- train_data %>% rpart(MMR~., data = .)
+```
+
+```{r}
+#Make predictions on the test set 
+preds<-predict(tree_fit,test_data)
+```
+### *Evaluating the Decision Tree Model Performance*
+```{r}
+#root mean squared error (RMSE)
+# A lower RMSE value is generally better, as it indicates smaller prediction errors
+rmse<- sqrt(mean((preds-test_data$MMR)^2))
+rmse
+```
+
+```{r}
+library(rpart.plot)
+```
 
 
+```{r}
+# Plot the decision tree
+rpart.plot(tree_fit, type = 4, extra = 101, under = TRUE, cex = 0.8, box.palette = "auto")
+```
 
 
+```{r}
+rules <- rpart.rules(tree_fit)
+print(rules)
 
+```
 
+### *Feature selection*
+#Feature selection:Identifying important variables can help you focus on relevant features and potentially remove less important ones, simplifying your model and reducing noise.
 
+```{r}
+library(vip)
 
-
-
-
-
-
-
-
-
-
-
-
+# Create a variable importance plot
+var_importance <- vip::vip(tree_fit, num_features = 10)
+print(var_importance)
+```
 
 
 
