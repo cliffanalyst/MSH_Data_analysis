@@ -1,5 +1,5 @@
 ---
-title: "AN INTRODUCTION TO DATA SCIENCE IN R MODULE"
+title: "AN INTRO TO DATA SCIENCE IN R MODULE"
 author: "Clifford Oduor,MSc"
 date: "`r Sys.Date()`"
 output: 
